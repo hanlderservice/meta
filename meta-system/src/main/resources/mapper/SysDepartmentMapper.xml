@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chenyu.meta.system.mapper.SysDepartmentMapper">
+
+
+    <!--<![CDATA[ >= ]]>-->
+    <sql id="qrySysDepartmentSql">
+ 	 SELECT
+            id AS departmentId,
+            dept_code AS deptCode,
+            dept_name AS deptName,
+            parent_id AS parentId,
+            level,
+            leader,
+            phone,
+            email,
+            state,
+            del_flag AS delFlag,
+            sort,
+            remark,
+            version,
+            create_by AS createBy,
+            create_time AS createTime
+        FROM
+            uos_department
+        WHERE 1=1
+    </sql>
+
+
+    <select id="qrySysDepartmentById" parameterType="java.util.Map"
+            resultType="com.chenyu.meta.system.domain.SysDepartment">
+        <include refid="qrySysDepartmentSql"></include>
+        AND id = #{departmentId}
+
+    </select>
+
+    <select id="qrySysDepartmentList" parameterType="java.util.Map"
+            resultType="com.chenyu.meta.system.domain.SysDepartment">
+        <include refid="qrySysDepartmentSql"></include>
+
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(departmentId)">
+            AND id = #{departmentId}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(deptName)">
+            AND dept_name = #{deptName}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(state)">
+            AND state = #{state}
+        </if>
+        ORDER BY create_time DESC
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(pageIndex)">
+            limit #{pageIndex},#{pageSize}
+        </if>
+
+    </select>
+
+    <select id="qrySysDepartmentCounts" parameterType="java.util.Map"
+            resultType="java.lang.Integer">
+
+        SELECT
+        COUNT(1) as counts
+        FROM
+        uos_department
+        WHERE 1=1
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(departmentId)">
+            AND id = #{departmentId}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(deptName)">
+            AND dept_name = #{deptName}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(state)">
+            AND state = #{state}
+        </if>
+
+    </select>
+
+
+    <!--  dept_code AS deptCode,
+            dept_name AS deptName,
+            parent_id AS parentId,
+            level,
+            leader,
+            phone,
+            email,
+            state,
+            del_flag AS delFlag,
+            sort,
+            remark,
+            version,
+            create_by AS createBy,
+            create_time AS createTime
+        FROM
+            uos_department-->
+    <insert id="insertSysDepartment" parameterType="java.util.Map">
+         insert into uos_department (
+         dept_code, dept_name, parent_id, level, leader,
+         phone,email,
+         sort,remark,create_by,create_time)
+        values (
+        #{deptCode},
+        #{deptName},
+        #{parentId},
+        #{level},
+        #{leader},
+        #{phone},
+        #{email},
+        #{sort},
+        #{remark},
+        #{name},
+        now()
+        )
+    </insert>
+    <update id="updateSysDepartment" parameterType="com.chenyu.meta.system.param.SysDepartmentParam">
+
+        update uos_department
+        <set>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(deptCode)">
+                dept_code = #{deptCode},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(deptName)">
+                dept_name = #{deptName},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(parentId)">
+                parent_id = #{parentId},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(level)">
+                level = #{level},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(leader)">
+                leader = #{leader},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(phone)">
+                phone = #{phone},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(email)">
+                email = #{email},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(state)">
+                state = #{state},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(delFlag)">
+                del_flag = #{delFlag},
+            </if>
+
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(sort)">
+                sort = #{sort},
+            </if>
+
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(remark)">
+                remark = #{remark},
+            </if>
+
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(name)">
+                update_by = #{name},
+            </if>
+            update_time = now()
+        </set>
+        where id = #{departmentId}
+    </update>
+
+</mapper>

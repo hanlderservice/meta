@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chenyu.meta.system.mapper.UosNoticeMapper">
+
+
+    <insert id="saveUosNotice" parameterType="java.util.Map">
+         INSERT INTO uos_notice (
+             notice_title, notice_type_id, notice_msg, state,is_top,
+            is_read, create_by, create_time)
+        VALUES (
+            #{noticeTitle}, #{noticeTypeId}, #{noticeMsg}, #{state}, #{isTop}, #{isRead},#{createBy},now());
+
+    </insert>
+
+    <select id="qryUosNoticeList" parameterType="java.util.Map"
+            resultType="com.chenyu.meta.system.domain.UosNotice">
+        SELECT
+        unc.notice_id AS noticeId,
+        unc.notice_title AS noticeTitle,
+        unc.notice_type_id AS noticeTypeId,
+        unt.type_name as noticeType,
+        unc.notice_msg AS noticeMsg,
+        unc.state,
+        unc.is_top AS isTop,
+        unc.is_read AS isRead,
+        unc.create_by AS createBy,
+        unc.create_time AS createTime
+        FROM
+        uos_notice unc
+        LEFT JOIN uos_notice_type unt ON unt.type_id = unc.notice_type_id
+        WHERE
+        1 = 1
+        AND unc.state <![CDATA[<>]]> '10X'
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(noticeTitle)">
+            AND unc.notice_title LIKE concat(concat('%',#{noticeTitle}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(isTop)">
+            AND unc.is_top = #{isTop}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(isRead)">
+            AND unc.is_read = #{isRead}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(noticeTypeId)">
+            AND unc.notice_type_id = #{noticeTypeId}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(startTime)">
+            and log.create_time <![CDATA[ >= ]]> #{startTime}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(endTime)">
+            and log.create_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        ORDER BY unc.create_time DESC
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(pageIndex)">
+            limit #{pageIndex},#{pageSize}
+        </if>
+
+    </select>
+
+
+    <select id="qryUosNoticeCounts" parameterType="java.util.Map"
+            resultType="java.lang.Integer">
+        SELECT COUNT(1) AS counts FROM uos_notice unc
+        WHERE 1=1
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(noticeTitle)">
+            AND unc.notice_title LIKE concat(concat('%',#{noticeTitle}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(isTop)">
+            AND unc.is_top = #{isTop}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(isRead)">
+            AND unc.is_read = #{isRead}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(noticeTypeId)">
+            AND unc.notice_type_id = #{noticeTypeId}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(startTime)">
+            and log.create_time <![CDATA[ >= ]]> #{startTime}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(endTime)">
+            and log.create_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+
+
+    </select>
+
+
+    <update id="updateUosNotice" parameterType="java.util.List">
+        <foreach collection="list" item="item" separator=";">
+            update uos_notice
+            <set>
+                is_read = #{item.isRead},
+                update_by = #{item.username},
+                update_time = now()
+            </set>
+            where notice_id = #{item.noticeId}
+        </foreach>
+    </update>
+
+    <update id="deleteUosNotice" parameterType="java.util.List">
+        <foreach collection="list" item="item" separator=";">
+            update uos_notice
+            <set>
+                state = #{item.state},
+                update_by = #{item.username},
+                update_time = now()
+            </set>
+            where notice_id = #{item.noticeId}
+        </foreach>
+    </update>
+
+
+
+    <insert id="saveUosNoticeType" parameterType="java.util.Map">
+         INSERT INTO uos_notice_type (
+             type_name,state,create_by,create_time)
+        VALUES (
+            #{typeName},'10A', #{createBy},now());
+
+    </insert>
+
+
+    <select id="qryUosNoticeType" parameterType="java.util.Map"
+            resultType="java.util.Map">
+
+        SELECT
+        type_id AS typeId,
+        type_name AS typeName,
+        state,
+        create_by AS createBy,
+        create_time AS createTime
+        FROM
+        uos_notice_type
+        WHERE 1=1
+
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(typeName)">
+            AND type_name = #{typeName}
+        </if>
+        AND state='10A'
+
+
+    </select>
+
+
+
+
+
+
+
+</mapper>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chenyu.meta.quartz.mapper.ScheduleJobMapper">
+
+
+    <select id="qryJobList" parameterType="java.util.Map" resultType="com.chenyu.meta.quartz.entity.JobAndTrigger">
+        SELECT
+        job_id AS scheduleJobId,
+        job_name AS jobName,
+        job_group AS jobGroup,
+        alias_name AS aliasName,
+        job_class_name AS jobClassName,
+        cron_expression AS cronExpression,
+        is_durable AS isDurable,
+        job_trigger AS jobTrigger,
+        is_sync AS isSync,
+        job_desc AS jobDesc,
+        create_by AS createBy,
+        create_time AS createTime
+        FROM
+        qrtz_job_info
+        WHERE
+        1 =1
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(jobName)">
+            AND job_name LIKE concat(concat('%',#{jobName}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(jobGroup)">
+            AND job_group LIKE concat(concat('%',#{jobGroup}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(aliasName)">
+            AND alias_name LIKE concat(concat('%',#{aliasName}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(jobClassName)">
+            AND job_class_name LIKE concat(concat('%',#{jobClassName}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(isDurable)">
+            AND is_durable =#{isDurable}
+        </if>
+        ORDER BY create_time DESC
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(pageIndex)">
+            limit #{pageIndex},#{pageSize}
+        </if>
+
+    </select>
+
+    <insert id="addScheduleJob" parameterType="java.util.Map">
+
+      insert into qrtz_job_info (
+         job_name, job_group, alias_name, job_class_name, cron_expression, is_durable,job_trigger,is_sync,job_desc,create_by,create_time)
+        values (
+        #{jobName},
+        #{jobGroup},
+        #{aliasName},
+        #{jobClassName},
+        #{cronExpression},
+        #{isDurable},
+        #{jobTrigger},
+        #{isSync},
+        #{jobDesc},
+        #{userName},
+        now()
+        )
+    </insert>
+
+
+    <update id="updateScheduleJob" parameterType="java.util.Map">
+        update qrtz_job_info
+        <set>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(jobGroup)">
+                job_group = #{jobGroup},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(aliasName)">
+                alias_name = #{aliasName},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(cronExpression)">
+                cron_expression = #{cronExpression},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(isDurable)">
+                is_durable = #{isDurable},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(jobTrigger)">
+                job_trigger = #{jobTrigger},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(isSync)">
+                is_sync = #{isSync},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(jobDesc)">
+                job_desc = #{jobDesc},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(userName)">
+                update_by = #{userName},
+            </if>
+            update_time = now()
+        </set>
+        where job_id = #{jobId}
+    </update>
+
+    <update id="updateScheduleJob2" parameterType="java.util.Map">
+        update qrtz_job_info
+        <set>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(jobName)">
+                job_name = #{jobName},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(jobGroup)">
+                job_group = #{jobGroup},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(aliasName)">
+                alias_name = #{aliasName},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(jobClassName)">
+                job_class_name = #{jobClassName},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(cronExpression)">
+                cron_expression = #{cronExpression},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(isDurable)">
+                is_durable = #{isDurable},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(jobTrigger)">
+                job_trigger = #{jobTrigger},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(isSync)">
+                is_sync = #{isSync},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(jobDesc)">
+                job_desc = #{jobDesc},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(userName)">
+                update_by = #{userName},
+            </if>
+            update_time = now()
+        </set>
+        where job_id = #{id}
+    </update>
+
+
+</mapper>

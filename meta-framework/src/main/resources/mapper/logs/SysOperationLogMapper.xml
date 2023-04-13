@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chenyu.meta.framework.mapper.SysOperationLogMapper">
+
+
+    <insert id="saveSysOperationLog" parameterType="com.chenyu.meta.framework.domain.SysOperationLog">
+      INSERT INTO uos_operation_log(
+         id, request_id, user_id, user_name,
+         name, ip,  area, operator,
+         path, module, class_name,method_name,request_method,
+         content_type, request_body, param,token,type,
+         success, code, message,exception_name,exception_message,
+         browser_name, browser_version, engine_name,engine_version,os_name,
+         platform_name, mobile, device_name,device_model,remark,
+         create_time)
+      VALUES (
+        #{id}, #{requestId}, #{userId}, #{userName}, #{name},
+        #{ip},#{area}, #{operator}, #{path}, #{module},
+        #{className}, #{methodName}, #{requestMethod}, #{contentType}, #{requestBody},
+        #{param}, #{token}, #{type}, #{success}, #{code},
+        #{message}, #{exceptionName}, #{exceptionMessage}, #{browserName}, #{browserVersion},
+        #{engineName}, #{engineVersion}, #{osName}, #{platformName}, #{mobile},
+        #{deviceName}, #{deviceModel}, #{remark}, now()
+      )
+    </insert>
+
+    <select id="getSysOperationLogPageList" parameterType="java.util.Map"
+            resultType="com.chenyu.meta.framework.domain.SysOperationLog">
+        SELECT
+        log.id,
+        log.request_id AS requestId,
+        log.user_id AS userId,
+        log.user_name AS username,
+        log.name,
+        log.ip,
+        log.area,
+        log.operator,
+        log.path,
+        log.module,
+        log.class_name AS className,
+        log.method_name AS methodName,
+        log.request_method AS requestMethod,
+        log.content_type AS contentType,
+        log.request_body AS requestBody,
+        log.param,
+        log.token,
+        log.type,
+        log.success,
+        log.code,
+        log.message,
+        log.exception_name AS exceptionName,
+        log.exception_message AS exceptionMessage,
+        log.browser_name AS browserName,
+        log.browser_version AS browserVersion,
+        log.engine_name AS engineName,
+        log.engine_version AS engineVersion,
+        log.os_name AS osName,
+        log.platform_name AS platformName,
+        log.mobile,
+        log.device_name AS deviceName,
+        log.device_model AS deviceModel,
+        log.remark,
+        log.create_time AS createTime
+        FROM
+        uos_operation_log log
+        LEFT JOIN uos_user us ON us.username = log.user_name
+        WHERE
+        1 = 1
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(username)">
+            AND log.user_name LIKE concat(concat('%',#{username}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(ip)">
+            AND log.ip LIKE concat(concat('%',#{ip}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(param)">
+            AND log.param LIKE concat(concat('%',#{param}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(success)">
+            AND log.success =#{username}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(code)">
+            AND log.code LIKE concat(concat('%',#{code}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(path)">
+            AND log.code LIKE concat(concat('%',#{path}),'%')
+        </if>
+
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(startTime)">
+            and log.create_time <![CDATA[ >= ]]> #{startTime}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(endTime)">
+            and log.create_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        ORDER BY log.create_time DESC
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(pageIndex)">
+            limit #{pageIndex},#{pageSize}
+        </if>
+    </select>
+
+    <select id="getSysOperationLogCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+        SELECT
+        count(1)
+        FROM
+        uos_operation_log log
+        LEFT JOIN uos_user us ON us.username = log.user_name
+        WHERE
+        1 = 1
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(username)">
+            AND log.user_name LIKE concat(concat('%',#{username}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(ip)">
+            AND log.ip LIKE concat(concat('%',#{ip}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(param)">
+            AND log.param LIKE concat(concat('%',#{param}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(success)">
+            AND log.success =#{username}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(code)">
+            AND log.code LIKE concat(concat('%',#{code}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(path)">
+            AND log.code LIKE concat(concat('%',#{path}),'%')
+        </if>
+
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(startTime)">
+            and log.create_time <![CDATA[ >= ]]> #{startTime}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(endTime)">
+            and log.create_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+
+    </select>
+
+
+</mapper>

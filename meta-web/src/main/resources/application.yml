@@ -1,0 +1,200 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      force: true
+      enabled: true
+  tomcat:
+    uri-encoding: UTF-8
+    threads:
+      max: 800
+      min-spare: 30
+# spring
+spring:
+  application:
+    name: Meta
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  profiles:
+    active: dev
+
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 20MB
+      max-file-size: 1024MB
+      location: /opt/upload/tmp
+      max-request-size: 20MB
+  main:
+    # 当遇到同样名字的时候，是否允许覆盖注册 true：允许覆盖注册
+    allow-bean-definition-overriding: true
+
+    # ##################MyBatis-plus start ###########
+  mybatis-plus:
+    # 启动时是否检查MyBatis XML文件是否存在
+    check-config-location: true
+    # 支持统配符 * 或者 ; 分割
+    typeEnumsPackage: com.chenyu.meta.*.enums
+    # MyBatis原生配置
+    configuration:
+      # 字段名称下划线转驼峰命名
+      map-underscore-to-camel-case: true
+    global-config:
+      db-config:
+        # 全局默认主键类型
+        id-type: auto
+        # 逻辑已删除值(默认为 1)
+        logic-delete-value: 1
+        # 逻辑未删除值(默认为 0)
+        logic-not-delete-value: 0
+    # mapper xml映射路径
+    mapper-locations: classpath*:mapper/**/*Mapper.xml
+
+    ######### Mybatis-plus end ################
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+  cache:
+    ehcache:
+      config: 'classpath:ehcache.xml'
+
+# 自定义
+
+# 自定义
+meta:
+  enable-ansi: true
+  # 是否启用验证码
+  enable-verify-code: false
+  # Swagger路径
+  swagger-paths: /swagger-ui.html,/swagger-ui/index.html,/docs,/doc.html,/swagger-resources/**,/webjars/**,/v3/api-docs,/csrf,/v3/api-docs-ext,/null/swagger-resources/**,/swagger-ui/**
+  # 服务器IP地址
+  server-ip: 127.0.0.1
+  # 默认新建用户登录初始化密码
+  login-init-salt: 666666
+  login-init-password: admin
+  login-init-head: http://${meta.server-ip}:8088/api/resource/logo.png
+
+  #  Swagger  2 start##访问地址 http://127.0.0.1:8888/swagger-ui.html#########
+  swagger:
+    enable: true
+    base:
+      package: com.chenyu.meta;com.chenyu.meta.system;com.chenyu.meta.adapter;com.chenyu.meta.framework;com.chenyu.meta.generator;com.chenyu.meta.quartz;com.chenyu.meta.wechat;com.chenyu.meta.quartz;com.chenyu.meta.cms;
+    contact:
+      name: lime
+      url: http://123456.com
+      email: 1029632196@qq.com
+    description:
+      title: ${spring.application.name} API docs
+      url: http://123456.com
+      #      version: ${project.version}
+      version: '@project.version@'
+      # 自定义参数配置，可配置N个
+      parameter-config:
+      - name:  ssss
+        description: Token request Header
+        type: header
+        data-type: String
+        required: false
+      ###      # swagger2  end ############
+  # AOP配置
+  aop:
+    #    AOP日志配置
+    log:
+      # 是否启用
+      enable: false
+      # 是否启用requestId
+      enable-request-id: true
+      # requestId生成规则: UUID/IDWORK
+      request-id-type: IDWORK
+      # NONE：不打印日志
+      # ORDER：请求和响应日志，按照执行顺序分开打印
+      # LINE：方法执行结束时，连续分开打印请求和响应日志
+      # MERGE：方法执行结束时，合并请求和响应日志，同时打印
+      log-print-type: ORDER
+      # 请求日志在控制台是否格式化输出，local环境建议开启，服务器环境设置为false
+      request-log-format: true
+      # 响应日志在控制台是否格式化输出，local环境建议开启，服务器环境设置为false
+      response-log-format: true
+      # 排除的路径
+      exclude-paths: /,/csrf
+    # 操作日志配置
+    operation-log:
+      # 是否启用
+      enable: true
+      # 排除的路径
+      exclude-paths: /systemApi/login,/systemApi/logout
+    # 登录日志配置
+    login-log:
+      # 是否启用
+      enable: true
+      # 登录地址
+      login-path: /systemApi/login
+      # 登出地址
+      logout-path: /systemApi/logout
+  ################## jwt  start ##################
+  jwt:
+    # token请求头名称
+    token-name: token
+    # jwt密钥
+    secret: 666666
+    # 发行人
+    issuer: ${spring.application.name}
+    # 主题
+    subject: web
+    # 观众
+    audience: web
+    # 默认过期时间1小时，单位：秒
+    expire-second: 86400
+    # 是否刷新token
+    refresh-token: true
+    # 刷新token的时间间隔，默认10分钟，单位：秒
+    refresh-token-countdown: 600
+    # redis校验jwt token是否存在,可选
+    redis-check: true
+    # true: 同一个账号只能是最后一次登录token有效，false：同一个账号可多次登录
+    single-login: false
+    # 盐值校验，如果不加自定义盐值，则使用secret校验
+    salt-check: true
+
+
+
+    ######################## Spring Shiro start ########################
+  shiro:
+    # 是否启用
+    enable: false
+    # 权限配置
+    anon:
+    # 排除登录登出
+    - /systemApi/login,/systemApi/logout,/systemApi/forget
+    # 排除静态资源
+    - /static/**,/templates/**
+    # 排除Swagger
+    - ${lime.swagger-paths}
+    # 排除actuator
+    - /actuator/**
+    - # 排除首页
+    - /,/index.html
+    # 排除测试路径
+    - /hello/world,/fooBar/**,/exampleOrder/**
+    # 多行字符串权限配置
+    filter-chain-definitions: |
+      /resource/**=anon
+      /upload/**=anon
+      /verificationCode/**=anon
+      /enum=anon
+      /getSysUserInfo=anon
+    permission:
+
+    ######################## Spring Shiro end ##########################
+  ######微信公众号配置######
+  weixin:
+    app-id: wxd79ca44f9b621ef4
+    appsecret: 9292bfd462fa5063f1c255cb81d4eb35
+  ########weixin end#########
+  knife4j:
+    enable: true
+

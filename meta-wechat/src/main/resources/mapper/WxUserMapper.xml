@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chenyu.meta.wechat.mapper.WxUserMapper">
+
+
+    <!--<![CDATA[ >= ]]>-->
+
+    <insert id="createUserInfo" parameterType="java.util.Map">
+
+      insert into wx_user_info (
+         openid, nickname, headimgurl, sex, country,
+         province,city, subscribe, language, subscribe_time,
+         unionid, remark, groupid, tagid_list,
+         subscribe_scene, qr_scene, qr_scene_str,is_black_list)
+        values (
+        #{openid}, #{nickname}, #{headimgurl}, #{sex},#{country},
+        #{province},#{city}, #{subscribe}, #{language}, #{subscribe_time},
+        #{unionid}, #{remark}, #{groupid}, #{tagid_list},
+        #{subscribe_scene}, #{qr_scene}, #{qr_scene_str},#{isBlackList}
+        )
+    </insert>
+
+
+    <select id="qryWxUserInfoByOpenId" parameterType="java.lang.String" resultType="java.util.Map">
+        SELECT
+        id,openid, nickname, headimgurl, sex, country,
+        province,city, subscribe, language, subscribe_time,
+        unionid, remark, groupid, tagid_list,
+        subscribe_scene, qr_scene, qr_scene_str,is_black_list AS isBlackList
+        FROM
+        wx_user_info wxus
+        WHERE 1=1
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(openid)">
+            AND wxus.openid = #{openid}
+        </if>
+    </select>
+
+
+    <select id="qryWxUserList" parameterType="com.chenyu.meta.wechat.param.WxUserParams" resultType="java.util.Map">
+
+        SELECT
+        id,openid, nickname, headimgurl, sex, country,
+        province,city, subscribe, language, subscribe_time,
+        unionid, remark, groupid, tagid_list,
+        subscribe_scene, qr_scene, qr_scene_str
+        FROM
+        wx_user_info wxus
+        WHERE 1=1
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(openid)">
+            AND wxus.openid LIKE concat(concat('%',#{openid}),'%')
+        </if>
+
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(nickname)">
+            AND wxus.nickname LIKE concat(concat('%',#{nickname}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(country)">
+            AND wxus.country = #{country}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(province)">
+            AND wxus.province = #{province}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(city)">
+            AND wxus.city = #{city}
+        </if>
+
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(tagId)">
+            AND wxus.tagid_list LIKE concat(concat('%',#{tagId}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(subscribeScene)">
+            AND wxus.subscribe_scene = #{subscribeScene}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(isBlackList)">
+            AND wxus.is_black_list = #{isBlackList}
+        </if>
+        ORDER BY subscribe_time DESC
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(pageIndex)">
+            LIMIT #{pageIndex},#{pageSize}
+        </if>
+
+    </select>
+
+
+    <select id="qryWxUserCounts" parameterType="com.chenyu.meta.wechat.param.WxUserParams"
+            resultType="java.lang.Integer">
+
+        SELECT
+        COUNT(1) as counts
+        FROM
+        wx_user_info wxus
+        WHERE 1=1
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(openid)">
+            AND wxus.openid LIKE concat(concat('%',#{openid}),'%')
+        </if>
+
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(nickname)">
+            AND wxus.nickname LIKE concat(concat('%',#{nickname}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(country)">
+            AND wxus.country = #{country}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(province)">
+            AND wxus.province = #{province}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(city)">
+            AND wxus.city = #{city}
+        </if>
+
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(tagId)">
+            AND wxus.tagid_list LIKE concat(concat('%',#{tagId}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(subscribeScene)">
+            AND wxus.subscribe_scene = #{subscribeScene}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(isBlackList)">
+            AND wxus.is_black_list = #{isBlackList}
+        </if>
+
+    </select>
+
+
+    <update id="updateRemarkUserInfo" parameterType="java.util.Map">
+        update wx_user_info
+        <set>
+
+
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(nickname)">
+                nickname = #{nickname},
+            </if>
+
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(headimgurl)">
+                headimgurl = #{headimgurl},
+            </if>
+
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(sex)">
+                sex = #{sex},
+            </if>
+
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(country)">
+                country = #{country},
+            </if>
+
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(province)">
+                province = #{province},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(city)">
+                city = #{city},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(subscribe)">
+                subscribe = #{subscribe},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(language)">
+                language = #{language},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(subscribe_time)">
+                subscribe_time = #{subscribe_time},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(unionid)">
+                unionid = #{unionid},
+            </if>
+
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(remark)">
+                remark = #{remark},
+            </if>
+
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(groupid)">
+                groupid = #{groupid},
+            </if>
+
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(tagid_list)">
+                tagid_list = #{tagid_list},
+            </if>
+
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(subscribe_scene)">
+                subscribe_scene = #{subscribe_scene},
+            </if>
+
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(qr_scene)">
+                qr_scene = #{qr_scene},
+            </if>
+
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(qr_scene_str)">
+                qr_scene_str = #{qr_scene_str},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(isBlackList)">
+                is_black_list = #{isBlackList},
+            </if>
+
+
+        </set>
+        where 1=1
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(id)">
+            and id = #{id}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(openid)">
+            and openid = #{openid}
+        </if>
+
+    </update>
+
+
+    <update id="batchWxUserInfo" parameterType="java.util.List">
+        <foreach collection="list" item="item" separator=";">
+            update wx_user_info
+            <set>
+
+
+                <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(item.nickname)">
+                    nickname = #{item.nickname},
+                </if>
+
+                <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(item.headimgurl)">
+                    headimgurl = #{item.headimgurl},
+                </if>
+
+                <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(item.sex)">
+                    sex = #{item.sex},
+                </if>
+
+                <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(item.country)">
+                    country = #{item.country},
+                </if>
+
+                <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(item.province)">
+                    province = #{item.province},
+                </if>
+                <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(item.city)">
+                    city = #{item.city},
+                </if>
+                <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(item.subscribe)">
+                    subscribe = #{item.subscribe},
+                </if>
+                <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(item.language)">
+                    language = #{item.language},
+                </if>
+                <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(item.subscribe_time)">
+                    subscribe_time = #{item.subscribe_time},
+                </if>
+                <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(item.unionid)">
+                    unionid = #{item.unionid},
+                </if>
+
+                <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(item.remark)">
+                    remark = #{item.remark},
+                </if>
+
+                <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(item.groupid)">
+                    groupid = #{item.groupid},
+                </if>
+
+                <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(item.tagid_list)">
+                    tagid_list = #{item.tagid_list},
+                </if>
+
+                <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(item.subscribe_scene)">
+                    subscribe_scene = #{item.subscribe_scene},
+                </if>
+
+                <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(item.qr_scene)">
+                    qr_scene = #{item.qr_scene},
+                </if>
+
+                <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(item.qr_scene_str)">
+                    qr_scene_str = #{item.qr_scene_str},
+                </if>
+                <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(item.isBlackList)">
+                    is_black_list = #{item.isBlackList},
+                </if>
+            </set>
+            where 1=1
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(item.id)">
+                and id = #{item.id}
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(item.openid)">
+                and openid = #{item.openid}
+            </if>
+        </foreach>
+    </update>
+
+
+    <!--wx_user_cursor-->
+    <select id="qryWxUserCursor" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+        id,app_id AS appId, next_openid AS nextOpenId
+        FROM
+        wx_user_cursor wxus
+        WHERE 1=1
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(appId)">
+            AND wxus.app_id = #{appId}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(nextOpenId)">
+            AND wxus.next_openid = #{nextOpenId}
+        </if>
+
+    </select>
+
+
+    <insert id="createWxUserCursor" parameterType="java.util.Map">
+
+      insert into wx_user_cursor ( app_id, next_openid)
+        values ( #{appId}, #{nextOpenId})
+    </insert>
+
+
+    <update id="updateWxUserCursor" parameterType="java.util.Map">
+        update wx_user_cursor
+        <set>
+            next_openid = #{nextOpenId},
+
+        </set>
+        where 1=1
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(id)">
+            and id = #{id}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(appId)">
+            and app_id = #{appId}
+        </if>
+
+    </update>
+
+    <!--黑名单游标-->
+    <select id="qryWxBlackListCursor" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+        id,app_id AS appId, next_openid AS nextOpenId
+        FROM
+        wx_black_list_cursor wxus
+        WHERE 1=1
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(appId)">
+            AND wxus.app_id = #{appId}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(nextOpenId)">
+            AND wxus.next_openid = #{nextOpenId}
+        </if>
+
+    </select>
+
+
+    <insert id="createWxBlackListCursor" parameterType="java.util.Map">
+
+      insert into wx_black_list_cursor ( app_id, next_openid)
+        values ( #{appId}, #{nextOpenId})
+    </insert>
+
+
+    <update id="updateWxBlackListCursor" parameterType="java.util.Map">
+        update wx_black_list_cursor
+        <set>
+            next_openid = #{nextOpenId},
+
+        </set>
+        where 1=1
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(id)">
+            and id = #{id}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(appId)">
+            and app_id = #{appId}
+        </if>
+
+    </update>
+
+
+</mapper>

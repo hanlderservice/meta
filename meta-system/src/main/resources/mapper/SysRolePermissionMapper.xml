@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chenyu.meta.system.mapper.SysRolePermissionMapper">
+
+
+    <select id="getPermissionCodesByRoleId" resultType="java.lang.String">
+          SELECT
+               p.CODE
+          FROM
+               uos_role r
+               INNER JOIN uos_role_permission rp ON r.id = rp.role_id
+               INNER JOIN uos_permission p ON rp.permission_id = p.id
+          WHERE
+               r.state = 1
+               AND rp.state = 1
+               AND p.state = 1
+               AND r.id = #{roleId};
+    </select>
+
+</mapper>

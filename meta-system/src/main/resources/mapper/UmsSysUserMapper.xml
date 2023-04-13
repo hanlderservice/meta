@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chenyu.meta.system.mapper.UmsSysUserMapper">
+
+
+    <!--<![CDATA[ >= ]]>-->
+
+    <select id="qrySysUser" parameterType="java.util.Map"
+            resultType="com.chenyu.meta.system.domain.SysUser">
+
+        SELECT
+        us.id AS userId,
+        us.username,
+        us.nickname,
+        us.phone,
+        us.email,
+        us.gender,
+        us.head,
+        us.remark,
+        us.state,
+        us.department_id AS departmentId,
+        us.role_id AS roleId,
+        us.deleted,
+        DATE_FORMAT(us.create_time, '%Y-%m-%d %H:%i:%s') as createDate
+        FROM
+        uos_user us
+        WHERE 1=1
+        AND us.username = #{username}
+        AND us.password = #{password}
+
+
+    </select>
+
+    <select id="qrySysUmsUserByUserName" parameterType="java.lang.String"
+            resultType="com.chenyu.meta.system.domain.SysUser">
+
+        SELECT
+        us.id AS userId,
+        us.username,
+        us.nickname,
+        us.phone,
+        us.email,
+        us.gender,
+        us.head,
+        us.remark,
+        DATE_FORMAT(us.create_time, '%Y-%m-%d %H:%i:%s') as createDate
+        FROM
+        uos_user us
+        WHERE 1=1
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(username)">
+            AND us.username = #{username}
+        </if>
+
+
+    </select>
+
+
+    <select id="qrySysUmsUserList" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+        us.id AS userId,
+        us.username,
+        us.nickname,
+        us.`password`,
+        us.phone,
+        us.email,
+        us.gender,
+        us.head,
+        us.remark,
+        DATE_FORMAT(us.create_time, '%Y-%m-%d %H:%i:%s') as createDate,
+        ur.role_name,
+        ur.id AS roleId,
+        ud.id AS deptId,
+        ud.dept_name AS deptName
+        FROM
+        uos_user us
+        LEFT JOIN uos_user_role uur ON us.id = uur.user_id
+        LEFT JOIN uos_role ur ON uur.role_id = ur.id
+        LEFT JOIN uos_role_department urd ON ur.id = urd.role_id
+        LEFT JOIN uos_department ud ON urd.dept_id = ud.id
+        WHERE
+        1 = 1
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(userId)">
+            AND us.id = #{userId}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(username)">
+            AND us.username = #{username}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(nickname)">
+            AND us.nickname LIKE concat(concat('%',#{nickname}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(phone)">
+            AND us.phone LIKE concat(concat('%',#{phone}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(email)">
+            AND us.email LIKE concat(concat('%',#{email}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(gender)">
+            AND us.gender =#{gender}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(roleId)">
+            AND ur.id =#{roleId}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(deptId)">
+            AND ud.id =#{deptId}
+        </if>
+        ORDER BY us.create_time DESC
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(pageIndex)">
+            limit #{pageIndex},#{pageSize}
+        </if>
+
+    </select>
+
+    <select id="qrySysUmsUserCounts" parameterType="java.util.Map" resultType="java.lang.Integer">
+        SELECT
+        count(*) AS counts
+        FROM
+        uos_user us
+        LEFT JOIN uos_user_role uur ON us.id = uur.user_id
+        LEFT JOIN uos_role ur ON uur.role_id = ur.id
+        LEFT JOIN uos_role_department urd ON ur.id = urd.role_id
+        LEFT JOIN uos_department ud ON urd.dept_id = ud.id
+        WHERE
+        1 = 1
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(userId)">
+            AND us.id = #{userId}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(username)">
+            AND us.username = #{username}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(nickname)">
+            AND us.nickname LIKE concat(concat('%',#{nickname}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(phone)">
+            AND us.phone LIKE concat(concat('%',#{phone}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(email)">
+            AND us.email LIKE concat(concat('%',#{email}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(gender)">
+            AND us.gender =#{gender}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(roleId)">
+            AND ur.id =#{roleId}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(deptId)">
+            AND ud.id =#{deptId}
+        </if>
+
+
+    </select>
+
+
+    <insert id="saveSysUmsUser" parameterType="java.util.Map">
+
+      insert into uos_user (
+         username, nickname, password, salt, user_type,
+         phone,email,gender,head,remark,department_id,
+         role_id,create_by,create_time)
+        values (
+        #{username},
+        #{nickname},
+        #{password},
+        #{salt},
+        #{userType},
+        #{phone},
+        #{email},
+        #{gender},
+        #{head},
+        #{remark},
+        #{departmentId},
+        #{roleId},
+        #{name},
+        now()
+        )
+    </insert>
+
+
+    <update id="updateSysUmsUser" parameterType="java.util.Map">
+        update uos_user
+        <set>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(username)">
+                username = #{username},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(nickname)">
+                nickname = #{nickname},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(password)">
+                password = #{password},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(salt)">
+                salt = #{salt},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(userType)">
+                user_type = #{userType},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(phone)">
+                phone = #{phone},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(email)">
+                email = #{email},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(gender)">
+                gender = #{gender},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(head)">
+                head = #{head},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(remark)">
+                remark = #{remark},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(state)">
+                state = #{state},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(deleted)">
+                deleted = #{deleted},
+            </if>
+
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(username)">
+                update_by = #{username},
+            </if>
+            update_time = now()
+        </set>
+        where id = #{userId}
+    </update>
+
+    <delete id="batchDelSysUmsUser" parameterType="java.util.List">
+
+        delete from uos_user where id in
+        <foreach item="item" collection="list" open="(" separator="," close=")">
+            #{empnoItem}
+        </foreach>
+
+    </delete>
+
+    <update id="resetPassword" parameterType="java.util.Map">
+
+        update uos_user
+        <set>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(password)">
+                password = #{password},
+            </if>
+
+        </set>
+        where id = #{userId}
+
+
+    </update>
+
+
+</mapper>

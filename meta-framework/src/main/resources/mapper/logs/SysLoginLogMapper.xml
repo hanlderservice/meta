@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chenyu.meta.framework.mapper.SysLoginLogMapper">
+
+    <insert id="saveSysLoginLog" parameterType="com.chenyu.meta.framework.domain.SysLoginLog">
+        INSERT INTO uos_login_log (
+            id, request_id, username, ip, area, operator,param,
+            token, type, success, code,message, exception_message,
+            user_agent, browser_name, browser_version, engine_name,
+            engine_version, os_name, platform_name, mobile, device_name,
+            device_model, remark, create_time)
+        VALUES (
+            #{id}, #{requestId}, #{username}, #{ip},
+            #{area}, #{operator},#{param}, #{token}, #{type},
+            #{success}, #{code},#{message}, #{exceptionMessage}, #{userAgent},
+            #{browserName}, #{browserVersion}, #{engineName}, #{engineVersion}, #{osName}, #{platformName},#{mobile},
+            #{deviceName}, #{deviceModel}, #{remark}, now());
+
+
+    </insert>
+
+    <select id="getSysLoginLogPageList" parameterType="java.util.Map"
+            resultType="com.chenyu.meta.framework.domain.SysLoginLog"
+    >
+        SELECT
+        log.id ,
+        log.request_id AS requestId,
+        log.username,
+        log.ip,
+        log.area,
+        log.operator,
+        log.param,
+        log.success,
+        log.exception_message AS exceptionMessage,
+        log.user_agent AS userAgent,
+        log.browser_name AS browserName,
+        log.browser_version AS browserVersion,
+        log.engine_name AS engineName,
+        log.engine_version AS engineVersion,
+        log.os_name AS osName,
+        log.platform_name AS platformName,
+        log.mobile,
+        log.device_name AS deviceName,
+        log.device_model AS deviceModel,
+        log.remark,
+        log.create_time AS createTime
+        FROM
+        uos_login_log log
+        LEFT JOIN uos_user us ON us.username=log.username
+        WHERE 1=1
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(username)">
+            AND log.username LIKE concat(concat('%',#{username}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(ip)">
+            AND log.ip LIKE concat(concat('%',#{ip}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(param)">
+            AND log.param LIKE concat(concat('%',#{param}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(success)">
+            AND log.success =#{username}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(code)">
+            AND log.code LIKE concat(concat('%',#{code}),'%')
+        </if>
+
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(startTime)">
+            and log.create_time <![CDATA[ >= ]]> #{startTime}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(endTime)">
+            and log.create_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        ORDER BY log.create_time DESC
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(pageIndex)">
+            limit #{pageIndex},#{pageSize}
+        </if>
+    </select>
+    <select id="getSysLoginLogCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+        SELECT
+        count(1)
+        FROM
+        uos_login_log log
+        LEFT JOIN uos_user us ON us.username=log.username
+        WHERE 1=1
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(username)">
+            AND log.username LIKE concat(concat('%',#{username}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(ip)">
+            AND log.ip LIKE concat(concat('%',#{ip}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(param)">
+            AND log.param LIKE concat(concat('%',#{param}),'%')
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(success)">
+            AND log.success =#{username}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(code)">
+            AND log.code LIKE concat(concat('%',#{code}),'%')
+        </if>
+
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(startTime)">
+            and log.create_time <![CDATA[ >= ]]> #{startTime}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(endTime)">
+            and log.create_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+
+    </select>
+
+
+</mapper>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chenyu.meta.framework.mapper.IpAddressMapper">
+
+
+    <select id="queryAreaByIp" parameterType="java.lang.String"
+            resultType="com.chenyu.meta.framework.domain.IpAddress">
+
+        SELECT id,area,operator FROM ip_address WHERE (INET_ATON(#{ip})
+        BETWEEN INET_ATON(ip_start) AND INET_ATON(ip_end))
+
+    </select>
+
+
+    <insert id="saveHostIp" parameterType="java.util.HashMap">
+        INSERT INTO ip_address (
+            id, ip_start, ip_end, area, operator,ip_start_num,ip_end_num
+         )
+        VALUES (
+            #{id}, #{ip_start}, #{ip_end}, #{area},#{operator},#{ip_start_num},#{ip_end_num}
+        );
+    </insert>
+
+
+    <select id="queryIpAddress" parameterType="java.util.Map"
+            resultType="com.chenyu.meta.framework.domain.IpAddress">
+
+        SELECT id, ip_start, ip_end, area, operator FROM ip_address WHERE 1=1
+
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(ip_start)">
+            and ip_start = #{ip_start}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(ip_end)">
+            and ip_end = #{ip_end}
+        </if>
+    </select>
+
+    <update id="updateIpAddress">
+        update ip_address
+        <set>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(area)">
+                area = #{area},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(operator)">
+                operator = #{operator},
+            </if>
+        </set>
+        where
+        1=1
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(id)">
+            and id = #{id}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(ip_start)">
+            and ip_start = #{ip_start}
+        </if>
+
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(ip_end)">
+            and ip_end = #{ip_end}
+        </if>
+
+        id = #{id}
+    </update>
+
+
+</mapper>

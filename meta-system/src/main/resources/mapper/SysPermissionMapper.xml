@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chenyu.meta.system.mapper.SysPermissionMapper">
+
+
+    <sql id="base_column_list">
+       id as menuId, menu_name as menuName, parent_id as parentId, url, code,components,
+        icon, type, level,visible, state, sort, remark, version,create_by as createBy, create_time as createTime, update_time as updateTime
+     </sql>
+
+
+    <select id="getSysPermissionById" resultType="java.util.Map">
+        select
+        <include refid="base_column_list"/>
+        from sys_permission where id = #{id}
+    </select>
+
+    <select id="getSysPermissionPageList" parameterType="java.util.Map"
+            resultType="com.chenyu.meta.system.domain.SysPermission">
+        select
+        <include refid="base_column_list"/>
+        from sys_permission
+        where 1=1
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(id)">
+            and id = #{id}
+        </if>
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(name)">
+            and menu_name = #{name}
+        </if>
+         <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(parentId)">
+            and parent_id = #{parentId}
+        </if>
+
+        ORDER BY create_time DESC
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(pageSize)">
+            limit #{pageIndex}, #{pageSize}
+        </if>
+
+    </select>
+
+
+    <select id="getPermissionCodesByUserId" resultType="java.lang.String">
+        select p.code
+        from sys_user u
+                 inner join sys_role r
+                            on u.role_id = r.id
+                 inner join sys_role_permission rp
+                            on r.id = rp.role_id
+                 inner join sys_permission p
+                            on rp.permission_id = p.id
+        where u.state = 1
+          and r.state = 1
+          and rp.state = 1
+          and p.state = 1
+          and u.deleted = 0
+          and u.id = #{userId};
+    </select>
+
+
+    <select id="getMenuListByUserId" parameterType="java.lang.String">
+        select p.*
+        from sys_user u
+                 inner join sys_role r
+                            on u.role_id = r.id
+                 inner join sys_role_permission rp
+                            on r.id = rp.role_id
+                 inner join sys_permission p
+                            on rp.permission_id = p.id
+        where u.state = 1
+          and u.deleted = 0
+          and r.state = 1
+          and rp.state = 1
+          and p.state = 1
+          and u.id = #{userId}
+    </select>
+
+
+    <insert id="saveSysPermission" parameterType="java.util.HashMap">
+        insert into sys_permission (
+         name, parent_id,url, code, icon, type, level, state, sort, remark, version,create_time)
+        values (
+        #{name},
+        #{parentId},
+        #{url},
+        #{code},
+        #{icon},
+        #{type},
+        #{level},
+        #{state},
+        #{sort},
+        #{remark},
+        #{version},
+        now()
+        )
+    </insert>
+
+
+    <update id="updateSysRolePermission">
+        update sys_permission
+        <set>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(name)">
+                name = #{name},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(parentId)">
+                parent_id = #{parentId},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(url)">
+                url = #{url},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(code)">
+                code = #{code},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(icon)">
+                icon = #{icon},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(type)">
+                type = #{type},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(level)">
+                level = #{level},
+            </if>
+
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(state)">
+                state = #{state},
+            </if>
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(sort)">
+                sort = #{sort},
+            </if>
+
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(remark)">
+                remark = #{remark},
+            </if>
+
+            <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(version)">
+                version = #{version},
+            </if>
+            update_time = now()
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysPermissionById" parameterType="java.lang.String">
+        delete from  sys_permission where id = #{id}
+    </delete>
+
+
+    <select id="qrySysPermMenuByUserId" parameterType="java.lang.String"
+            resultType="com.chenyu.meta.system.domain.SysPermission">
+        SELECT
+        sp.id AS menuId,
+        sp.menu_name AS menuName,
+        sp.parent_id AS parentId,
+        sp.url,
+        IFNULL( sp.CODE, '' ) AS CODE,
+        sp.components,
+        sp.icon,
+        sp.type,
+        sp.`level`,
+        sp.visible,
+        sp.state,
+        sp.sort,
+        sp.remark,
+        sp.version,
+        sp.create_by AS createBy,
+        sp.create_time AS createTime,
+        sp.update_by AS updateBy,
+        sp.update_time AS updateTime
+        FROM
+        sys_permission sp
+        LEFT JOIN sys_role_permission srp ON sp.id = srp.permission_id
+        LEFT JOIN sys_user_role ur ON srp.role_id = ur.role_id
+        LEFT JOIN sys_role ro ON ur.role_id = ro.id
+        LEFT JOIN sys_user u ON ur.user_id = u.id
+        WHERE 1=1
+        and sp.type in ('1') and sp.state = 1 AND ro.state = 1
+        <if test="@com.chenyu.meta.common.util.Ognl@isNotEmpty(userId)">
+            and u.id =#{userId}
+        </if>
+
+        order by sp.parent_id, sp.sort
+
+    </select>
+
+    <select id="qryMenuTreeAll" parameterType="java.lang.String"
+            resultType="com.chenyu.meta.system.domain.SysPermission">
+                SELECT
+                    sp.id AS menuId,
+                    sp.menu_name AS menuName,
+                    sp.parent_id AS parentId,
+                    sp.url,
+                    IFNULL( sp.CODE, '' ) AS CODE,
+                    sp.components,
+                    sp.icon,
+                    sp.type,
+                    sp.`level`,
+                    sp.visible,
+                    sp.state,
+                    sp.sort,
+                    sp.remark,
+                    sp.version,
+                    sp.create_by AS createBy,
+                    sp.create_time AS createTime,
+                    sp.update_by AS updateBy,
+                    sp.update_time AS updateTime
+                FROM
+                    sys_permission sp
+                    where sp.type in ('1') and sp.state = 1
+                        order by sp.parent_id, sp.sort
+    </select>
+
+
+</mapper>
